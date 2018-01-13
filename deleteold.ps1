@@ -1,16 +1,16 @@
-<#   
-.SYNOPSIS   
+<#
+.SYNOPSIS
 Script to delete or list old files in a folder
-    
-.DESCRIPTION 
+
+.DESCRIPTION
 Script to delete files older than x-days. The script is built to be used as a scheduled task, it automatically generates a logfile name based on the copy location and the current date/time. There are various levels of logging available and the script can also run in -listonly mode in which it only lists the files it would otherwise delete. There are two main routines, one to delete the files and a second routine that checks if there are any empty folders left that could be deleted.
-	
-.PARAMETER FolderPath 
+
+.PARAMETER FolderPath
 The path that will be recusively scanned for old files.
 
 .PARAMETER Fileage
 Filter for age of file, entered in days. Use -1 for all files to be removed.
-	
+
 .PARAMETER LogFile
 Specifies the full path and filename of the logfile. When the LogFile parameter is used in combination with -autolog only the path is required.
 
@@ -140,17 +140,9 @@ If this switch is specified only files will be deleted and the existing folder w
 
 .PARAMETER ArchivedOnly
 If this switch is specified only files that have the archive bit cleared (meaning backed up) will be purged.
-.NOTES   
-Name: deleteold.ps1
-Author: Jaap Brasser
-Version: 2.0.5
-DateCreated: 2012-03-04
-DateUpdated: 2016-04-12
 
-.LINK
-http://www.jaapbrasser.com
 
-.EXAMPLE   
+.EXAMPLE
 .\deleteold.ps1 -FolderPath H:\scripts -FileAge 100 -ListOnly -LogFile H:\log.log
 
 Description:
@@ -240,7 +232,7 @@ Deletes files older than 10 days, excluding xls files. Log file is stored in the
 Description:
 Deletes all files that were created 30 days ago or before in the C:\docs folder. With the exclusion of files last modified/created specified in the -ExcludeDate query.
 
-.EXAMPLE   
+.EXAMPLE
 .\deleteold.ps1 -FolderPath H:\scripts -FileAge 100 -ListOnly -LogFile H:\log.log -ExcludeDate 'DateRange,2005-05-16,8'
 
 Description:
@@ -470,7 +462,7 @@ param(
 
             # Loop runs for number of times specified in the WeekRepeat parameter
             for ($j = 0; $j -lt $WeekRepeat; $j++)
-                { 
+                {
                     $CheckDate = $CurrentDate.Date.AddDays(-((7*$j)+$CurrentWeekDayInt-$DayOfWeek))
 
                     # Only display date if date is larger than current date, this is to exclude dates in the current week
@@ -482,7 +474,7 @@ param(
                         $WeekRepeat++
                     }
                 }
-            
+
             # Loop runs until $LimitYear parameter is exceeded
 			if ($WeekRepeat -eq -1) {
                 $j=0
@@ -502,7 +494,7 @@ param(
         for ($MonthCnt = 0; $MonthCnt -lt $DayOfMonth.Count; $MonthCnt++) {
             # Loop runs for number of times specified in the MonthRepeat parameter
             for ($j = 0; $j -lt $MonthRepeat[$MonthCnt]; $j++)
-                { 
+                {
                     $CheckDate = $CurrentDate.Date.AddMonths(-$j).AddDays($DayOfMonth[$MonthCnt]-$CurrentDate.Day)
 
                     # Only display date if date is larger than current date, this is to exclude dates ahead of the current date and
@@ -516,7 +508,7 @@ param(
                         $MonthRepeat[$MonthCnt]++
                     }
                 }
-            
+
             # Loop runs until $LimitYear parameter is exceeded
 		    if ($MonthRepeat[$MonthCnt] -eq -1) {
                 $j=0
@@ -541,16 +533,16 @@ param(
         $QuarterYearInt = $CurrentDate.Year
         $QuarterLoopCount = $QuarterRepeat
         $j = 0
-        
+
         do {
             switch ($QuarterInt) {
                 1 {
                     $CheckDate = ([DateTime]::ParseExact("$($QuarterYearInt)0101",'yyyyMMdd',$null)).AddDays($DayOfQuarter-1)
-                    
+
                     # Check for number of days in the 1st quarter, this depends on leap years
                     $DaysInFeb = ([DateTime]::ParseExact("$($QuarterYearInt)0301",'yyyyMMdd',$null)).AddDays(-1).Day
                     $DaysInCurrentQuarter = 31+$DaysInFeb+31
-                        
+
                     # If the number of days is larger that the total number of days in this quarter the quarter will be excluded
                     if ($DayOfQuarter -gt $DaysInCurrentQuarter) {
                         $CheckDate = $null
@@ -567,36 +559,36 @@ param(
                 }
                 2 {
                     $CheckDate = ([DateTime]::ParseExact("$($QuarterYearInt)0401",'yyyyMMdd',$null)).AddDays($DayOfQuarter-1)
-                        
+
                     # Check for number of days in the 2nd quarter
                     $DaysInCurrentQuarter = 30+31+30
-                        
+
                     # If the number of days is larger that the total number of days in this quarter the quarter will be excluded
                     if ($DayOfQuarter -gt $DaysInCurrentQuarter) {
                         $CheckDate = $null
                     }
 
                     # This check is built-in to return the date last date of the current quarter, to ensure consistent results
-                    # in case the command is executed on the last day of a quarter                       
+                    # in case the command is executed on the last day of a quarter
                     if ($DayOfQuarter -eq 0) {
                         $CheckDate = [DateTime]::ParseExact("$($QuarterYearInt)0630",'yyyyMMdd',$null)
                     }
-                        
+
                     $QuarterInt = 1
                 }
                 3 {
                     $CheckDate = ([DateTime]::ParseExact("$($QuarterYearInt)0701",'yyyyMMdd',$null)).AddDays($DayOfQuarter-1)
-                        
+
                     # Check for number of days in the 3rd quarter
                     $DaysInCurrentQuarter = 31+31+30
-                        
+
                     # If the number of days is larger that the total number of days in this quarter the quarter will be excluded
                     if ($DayOfQuarter -gt $DaysInCurrentQuarter) {
                         $CheckDate = $null
                     }
-                        
+
                     # This check is built-in to return the date last date of the current quarter, to ensure consistent results
-                    # in case the command is executed on the last day of a quarter                       
+                    # in case the command is executed on the last day of a quarter
                     if ($DayOfQuarter -eq 0) {
                         $CheckDate = [DateTime]::ParseExact("$($QuarterYearInt)0930",'yyyyMMdd',$null)
                     }
@@ -605,33 +597,33 @@ param(
                 }
                 4 {
                     $CheckDate = ([DateTime]::ParseExact("$($QuarterYearInt)1001",'yyyyMMdd',$null)).AddDays($DayOfQuarter-1)
-                        
+
                     # Check for number of days in the 4th quarter
                     $DaysInCurrentQuarter = 31+30+31
-                        
+
                     # If the number of days is larger that the total number of days in this quarter the quarter will be excluded
                     if ($DayOfQuarter -gt $DaysInCurrentQuarter) {
                         $CheckDate = $null
                     }
 
                     # This check is built-in to return the date last date of the current quarter, to ensure consistent results
-                    # in case the command is executed on the last day of a quarter                       
+                    # in case the command is executed on the last day of a quarter
                     if ($DayOfQuarter -eq 0) {
                         $CheckDate = [DateTime]::ParseExact("$($QuarterYearInt)1231",'yyyyMMdd',$null)
-                    }                        
+                    }
                     $QuarterInt = 3
                 }
             }
 
             # Only display date if date is larger than current date, and only execute check if $CheckDate is not equal to $null
             if ($CheckDate -le $CurrentDate -and $CheckDate -ne $null) {
-                    
+
                 # Only display the date if it is not further in the past than the limit year
                 if ($CheckDate.Year -ge $LimitYear -and $QuarterRepeat -eq -1) {
                     $CheckDate
                 }
 
-                # If the repeat parameter is not set to -1 display results regardless of limit year                    
+                # If the repeat parameter is not set to -1 display results regardless of limit year
                 if ($QuarterRepeat -ne -1) {
                     $CheckDate
                     $j++
@@ -639,8 +631,8 @@ param(
                     $QuarterLoopCount++
                 }
             }
-            # Added if statement to catch errors regarding 
-        } while ($(if ($QuarterRepeat -eq -1) {$LimitYear -le $(if ($CheckDate) {$CheckDate.Year} else {9999})} 
+            # Added if statement to catch errors regarding
+        } while ($(if ($QuarterRepeat -eq -1) {$LimitYear -le $(if ($CheckDate) {$CheckDate.Year} else {9999})}
                 else {$j -lt $QuarterLoopCount}))
     }
 
@@ -652,12 +644,12 @@ param(
         # Mainloop containing the loop for selecting a day of a year
         do {
             $CheckDate = ([DateTime]::ParseExact("$($YearInt)0101",'yyyyMMdd',$null)).AddDays($DayOfYear-1)
-            
-            # If the last day of the year is specified, a year is added to get consistent results when the query is executed on last day of the year 
+
+            # If the last day of the year is specified, a year is added to get consistent results when the query is executed on last day of the year
             if ($DayOfYear -eq 0) {
                 $CheckDate = $CheckDate.AddYears(1)
             }
-            
+
             # Set checkdate to null to allow for selection of last day of leap year
             if (($DayOfYear -eq 366) -and !([DateTime]::IsLeapYear($YearInt))) {
                 $CheckDate = $null
@@ -679,7 +671,7 @@ param(
                 }
             }
             $YearInt--
-        } while ($(if ($DayOfYearRepeat -eq -1) {$LimitYear -le $(if ($CheckDate) {$CheckDate.Year} else {9999})} 
+        } while ($(if ($DayOfYearRepeat -eq -1) {$LimitYear -le $(if ($CheckDate) {$CheckDate.Year} else {9999})}
                 else {$j -lt $YearLoopCount}))
     }
 
@@ -692,7 +684,7 @@ param(
                     $CheckDate = [DateTime]::ParseExact($Date,'yyyy\/MM\/dd',$null)
                 } catch {}
             }
-            
+
             if ($CheckDate -le $CurrentDate) {
                 $CheckDate
             }
@@ -710,7 +702,7 @@ param(
             } catch {}
         }
         if ($CheckDate) {
-            for ($k = 0; $k -lt $DateRangeRepeat; $k++) { 
+            for ($k = 0; $k -lt $DateRangeRepeat; $k++) {
                 if ($CheckDate -le $CurrentDate) {
                     $CheckDate
                 }
@@ -777,7 +769,7 @@ $Switches = "`r`n`t`t-FolderPath`r`n`t`t`t$FolderPath`r`n`t`t-FileAge $FileAge`r
         $ExcludeDate | ConvertFrom-Csv -Header:'Item1','Item2','Item3' -ErrorAction SilentlyContinue | ForEach-Object {
             $Switches += "`r`n`t`t`t"
             $Switches += ($_.Item1,$_.Item2,$_.Item3 -join ',').Trim(',')
-        }	    
+        }
     }
     if ($EmailTo) {
 	    $Switches += "`r`n`t`t-EmailTo"
@@ -806,7 +798,7 @@ $Switches = "`r`n`t`t-FolderPath`r`n`t`t`t$FolderPath`r`n`t`t-FileAge $FileAge`r
     if ($NoFolder)       {$Switches+="`r`n`t`t-NoFolder"}
     if ($ArchivedOnly)   {$Switches+="`r`n`t`t-ArchivedOnly"}    if ($RegExPath)      {$Switches+="`r`n`t`t-RegExPath"}
     if ($CompareCreateTimeLastModified) {$Switches+="`r`n`t`t-CompareCreateTimeLastModified"}
-    
+
 [long]$FilesSize    = 0
 [long]$FailedSize   = 0
 [int]$FilesNumber   = 0
@@ -869,7 +861,7 @@ if ($AppendLog) {
 ('-'*79) | Add-Content -LiteralPath $LogFile
 ' ' | Add-Content -LiteralPath $LogFile
 
-# Define the properties to be selected for the array, if createtime switch is specified 
+# Define the properties to be selected for the array, if createtime switch is specified
 # CreationTime is added to the list of properties, this is to conserve memory space
 $SelectProperty = @{'Property'='Fullname','Length','PSIsContainer'}
 if ($CreateTime) {
@@ -918,14 +910,14 @@ if ($IncludePath) {
         for ($j=0;$j -lt $IncludePath.Count;$j++) {
 		    [array]$NewFileList   += @($FileList   | Where-Object {$_.FullName -match $IncludePath[$j]})
             [array]$NewFolderList += @($FolderList | Where-Object {$_.FullName -match $IncludePath[$j]})
-        }        
+        }
     }
     $FileList = $NewFileList
     $FolderList = $NewFolderList
     $NewFileList=$NewFolderList = $null
 }
 
-# If the ExcludePath parameter is included then this loop will run. This will clear out the 
+# If the ExcludePath parameter is included then this loop will run. This will clear out the
 # excluded paths for both the filelist.
 if ($ExcludePath) {
     # If RegExpath has not been specified the script will escape all regular expressions from values specified
@@ -968,7 +960,7 @@ if ($ExcludeFileExtension) {
 $CheckError = $Error.Count - $CheckError
 if ($CheckError -gt 0) {
 	for ($j=0;$j -lt $CheckError;$j++) {
-        # Verifies is the error does not match an excluded path, only errors not matching excluded paths will be written to the Log	
+        # Verifies is the error does not match an excluded path, only errors not matching excluded paths will be written to the Log
         if ($ExcludePath) {
             if (!$RegExPath) {
                 if ($(for ($k=0;$k -lt $ExcludePath.Count;$k++) {$Error[$j].TargetObject -match [RegEx]::Escape($ExcludePath[$k].SubString(0,$ExcludePath[$k].Length-2))}) -notcontains $true) {
@@ -979,7 +971,7 @@ if ($CheckError -gt 0) {
                 if ($(for ($k=0;$k -lt $ExcludePath.Count;$k++) {$Error[$j].TargetObject -match $ExcludePath[$k]}) -notcontains $true) {
                     $TempErrorVar = "$($Error[$j].ToString()) ::: $($Error[$j].TargetObject)"
 		            "`tFAILED ACCESS`t$TempErrorVar" | Add-Content -LiteralPath $LogFile
-                }            
+                }
             }
 	    } else {
             $TempErrorVar = "$($Error[$j].ToString()) ::: $($Error[$j].TargetObject)"
